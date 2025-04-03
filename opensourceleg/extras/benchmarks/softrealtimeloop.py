@@ -7,6 +7,8 @@ from opensourceleg.extras.benchmarks.stress import add_compute_stress
 from opensourceleg.logging import Logger
 from opensourceleg.utilities import SoftRealtimeLoop
 
+DATA_DIRECTORY = "./softrealtimeloop_data"
+
 
 def run_naive_rt_loop(
     frequency: float,
@@ -146,19 +148,19 @@ def plot_benchmark_results(
 
     axs[1, 0].plot(naive_loop_timestamps[1:], naive_error, "o-", markersize=2, alpha=0.5)
     axs[1, 0].set_title("Naive Loop - Error from Ideal Interval")
-    axs[1, 0].set_xlabel("Time (ms)")
+    axs[1, 0].set_xlabel("Time (s)")
     axs[1, 0].set_ylabel("Error (ms)")
     axs[1, 0].axhline(0, color="r", linestyle="dashed")
 
     axs[1, 1].plot(naive_rt_timestamps[1:], naive_rt_error, "o-", markersize=2, alpha=0.5)
     axs[1, 1].set_title("Naive RT Loop - Error from Ideal Interval")
-    axs[1, 1].set_xlabel("Time (ms)")
+    axs[1, 1].set_xlabel("Time (s)")
     axs[1, 1].set_ylabel("Error (ms)")
     axs[1, 1].axhline(0, color="r", linestyle="dashed")
 
     axs[1, 2].plot(soft_rt_timestamps[1:], soft_rt_error, "o-", markersize=2, alpha=0.5)
     axs[1, 2].set_title("SoftRealtimeLoop - Error from Ideal Interval")
-    axs[1, 2].set_xlabel("Time (ms)")
+    axs[1, 2].set_xlabel("Time (s)")
     axs[1, 2].set_ylabel("Error (ms)")
     axs[1, 2].axhline(0, color="r", linestyle="dashed")
 
@@ -215,7 +217,7 @@ def plot_benchmark_results(
     )
 
     fig.suptitle(
-        f"Timer Performance Benchmark - Target Frequency: {frequency} Hz, "
+        f"SoftRealtimeLoop Performance Benchmark - Target Frequency: {frequency} Hz, "
         f"Compute Stress: {load_percentage * 100}%, "
         f"Variable Load: {variable_load}",
         fontsize=12,
@@ -223,13 +225,13 @@ def plot_benchmark_results(
     fig.text(0.5, 0.0, summary_text, ha="center", va="bottom", fontfamily="monospace")
 
     plt.tight_layout(rect=[0, 0.05, 1, 0.97])
-    plt.savefig(f"timer_benchmark_{frequency}Hz_load{load_percentage}_variable{variable_load}.png", dpi=150)
+    plt.savefig(f"sfrt_benchmark_{frequency}Hz_load{load_percentage}_variable{variable_load}.png", dpi=150)
     plt.show()
 
 
 if __name__ == "__main__":
-    frequencies = [100, 200, 500, 1000]
-    load_percentage = 0.75
+    frequencies = [200, 500, 1000]
+    load_percentage = 0.80
     variable_load = True
     duration = 120
 
@@ -242,7 +244,7 @@ if __name__ == "__main__":
         rt_logger.info("  Running naive loop...")
         naive_loop_timestamps = run_naive_loop(freq, duration, load_percentage, variable_load)
 
-        rt_logger.info("  Running naive timer...")
+        rt_logger.info("  Running naive RT loop...")
         naive_rt_timestamps = run_naive_rt_loop(freq, duration, load_percentage, variable_load)
 
         rt_logger.info("  Running SoftRealtimeLoop...")
