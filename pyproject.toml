@@ -28,6 +28,7 @@ adafruit-circuitpython-bno055 = {version = "^5.4.13", markers = "sys_platform ==
 adafruit-circuitpython-lis3dh = {version = "^5.2.2", markers = "sys_platform == 'linux' and platform_machine == 'aarch64'"}
 
 pandas = "^2.2.3"
+plotly = "^6.0.1"
 [tool.poetry.extras]
 dephy = ["flexsea"]
 moteus = ["moteus", "moteus-pi3hat"]
