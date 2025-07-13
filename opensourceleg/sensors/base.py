@@ -1,6 +1,7 @@
 import time
 from abc import ABC, abstractmethod
 from functools import wraps
+from inspect import isabstract
 from typing import Any, Callable, ClassVar, Optional, cast
 
 
@@ -216,11 +217,24 @@ class SensorBase(ABC):
     updating, and streaming status.
     """
 
-    # Methods that should be mocked in offline mode
     ONLINE_METHODS: ClassVar[list[str]] = ["start", "stop", "update"]
-
-    # Properties that should be mocked in offline mode
     ONLINE_PROPERTIES: ClassVar[list[str]] = ["data", "is_streaming"]
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        """
+        Enforce implementation of online methods and properties in concrete subclasses.
+        """
+        super().__init_subclass__(**kwargs)
+        # This check applies only to concrete classes that directly inherit from SensorBase
+        if not isabstract(cls) and cls.__mro__[1] is SensorBase:
+            if cls.ONLINE_METHODS is SensorBase.ONLINE_METHODS:
+                raise NotImplementedError(
+                    f"{cls.__name__} is a concrete class and must override the 'ONLINE_METHODS' class variable."
+                )
+            if cls.ONLINE_PROPERTIES is SensorBase.ONLINE_PROPERTIES:
+                raise NotImplementedError(
+                    f"{cls.__name__} is a concrete class and must override the 'ONLINE_PROPERTIES' class variable."
+                )
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """
@@ -370,6 +384,9 @@ class ADCBase(SensorBase, ABC):
     ADC sensors are used to convert analog signals into digital data.
     """
 
+    ONLINE_METHODS: ClassVar[list[str]] = ["start", "stop", "update", "calibrate", "reset"]
+    ONLINE_PROPERTIES: ClassVar[list[str]] = ["data", "is_streaming", "is_calibrated"]
+
     def __init__(self, tag: str, offline: bool = False, **kwargs: Any) -> None:
         """
         Initialize the ADC sensor.
@@ -409,10 +426,7 @@ class EncoderBase(SensorBase, ABC):
     Encoders are used to measure position and velocity.
     """
 
-    # Methods that should be mocked in offline mode
     ONLINE_METHODS: ClassVar[list[str]] = ["start", "stop", "update"]
-
-    # Properties that should be mocked in offline mode
     ONLINE_PROPERTIES: ClassVar[list[str]] = ["data", "is_streaming", "position", "velocity"]
 
     def __init__(
@@ -465,10 +479,7 @@ class LoadcellBase(SensorBase, ABC):
     Load cells are used to measure forces and moments.
     """
 
-    # Methods that should be mocked in offline mode
     ONLINE_METHODS: ClassVar[list[str]] = ["start", "stop", "update", "calibrate", "reset"]
-
-    # Properties that should be mocked in offline mode
     ONLINE_PROPERTIES: ClassVar[list[str]] = [
         "data",
         "is_streaming",
@@ -599,10 +610,7 @@ class IMUBase(SensorBase, ABC):
     IMUs typically provide acceleration and gyroscopic data.
     """
 
-    # Methods that should be mocked in offline mode
     ONLINE_METHODS: ClassVar[list[str]] = ["start", "stop", "update"]
-
-    # Properties that should be mocked in offline mode
     ONLINE_PROPERTIES: ClassVar[list[str]] = [
         "data",
         "is_streaming",
