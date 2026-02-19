@@ -30,6 +30,10 @@ messaging = [
     "grpcio-tools>=1.65.5,<2",
     "types-protobuf>=4.21.0,<5",
 ]
+vso = [
+    "pyzmq>=27.1.0",
+    "scipy>=1.17.0",
+]
 
 [project.urls]
 Repository = "https://github.com/neurobionics/opensourceleg"
